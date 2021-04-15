@@ -1,11 +1,17 @@
 button{
         border-width: 0;
         background-color: inherit;
-        border: 1px thick black;
+        color: white;
 }
 
 li{
-        padding: 0 1rem;
+        padding: 0 0.5rem;
+}
+
+#nav-container{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
 }
 
 #home-img-container{
@@ -26,4 +32,14 @@ li{
 }
 .my-5{
         font-size: 1.25rem;
+}
+
+.err-message{
+    display: block;
+    width: 10rem;
+    margin: auto;
+    color: white;
+    border: 1px solid red;
+    margin-bottom: 5px;
+    border-radius: 10px;
 }

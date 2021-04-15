@@ -1,8 +1,11 @@
 import React from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Home from './pages/Home'
 import {BrowserRouter,Route} from 'react-router-dom';
+
+import Home from './pages/Home'
+import Faculty from './pages/Faculty'
+import Student from './pages/Student'
 
 function App()
 {
@@ -11,6 +14,8 @@ function App()
     <div>
         <BrowserRouter>
                 <Route exact path="/"><Home /></Route>
+                <Route path="/faculty"><Faculty /></Route>
+                <Route path="/student"><Student /></Route>
         </BrowserRouter>
     
     </div>
