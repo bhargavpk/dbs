@@ -18,3 +18,17 @@
     border: 1px solid black;
     border-radius: 3px;
 }
+
+.input-box{
+    width: 2rem;
+    height: 1.5rem;
+}
+
+#button-container{
+    margin: auto;
+    padding: 0.5rem 0;
+    text-align: center;
+}
+button#button-container{
+    display: inline-block;
+}

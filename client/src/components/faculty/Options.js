@@ -1,7 +1,18 @@
 import React from 'react'
+
 import Dropdown from 'react-bootstrap/Dropdown'
 
 export default function Options({ faculty }) {
+
+    const changeCourseName = courseName => {
+        const courseWords = courseName.split(' ')
+        var resultantCourse = ''
+        courseWords.forEach(word => {
+            resultantCourse = resultantCourse + word + '_'
+        })
+        resultantCourse = resultantCourse.slice(0, -1)
+        return resultantCourse
+    }
 
     const { facultyCourseList: courses } = faculty
 
@@ -17,7 +28,11 @@ export default function Options({ faculty }) {
                     <Dropdown.Menu>
                         {
                             courses.map(courseName => (
-                                <Dropdown.Item href="#">{courseName}</Dropdown.Item>
+                                <div className="options-element">
+                                    <Dropdown.Item href={'/faculty/attendance?course='+changeCourseName(courseName)}>
+                                        {courseName}
+                                    </Dropdown.Item>
+                                </div>
                             ))
                         }
                     </Dropdown.Menu>
@@ -32,7 +47,11 @@ export default function Options({ faculty }) {
                         <Dropdown.Menu>
                         {
                             courses.map(courseName => (
-                                <Dropdown.Item href="#">{courseName}</Dropdown.Item>
+                                <div className="options-element">
+                                    <Dropdown.Item href={'/faculty/grade?course='+changeCourseName(courseName)}>
+                                        {courseName}
+                                    </Dropdown.Item>
+                                </div>
                             ))
                         }
                         </Dropdown.Menu>

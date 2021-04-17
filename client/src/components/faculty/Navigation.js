@@ -6,7 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Button from 'react-bootstrap/Button'
 import '../../css/faculty.css'
 
-export default function Navigation() {
+export default function Navigation({ facultyId }) {
 
     const [isLoggedIn, changeLoggedStatus] = useState(true)
     
@@ -24,11 +24,7 @@ export default function Navigation() {
                 <div id="nav-data-container">
                     <ul class="navbar-nav mr-auto">
                             <li class="nav-item">
-                                    <button
-                                    class="nav-link"
-                                    >
-                                        View profile
-                                    </button>
+                                    <a className="nav-link" href={"/faculty/profile?id="+facultyId}>View profile</a>
                             </li>              
                     </ul>
                 </div>

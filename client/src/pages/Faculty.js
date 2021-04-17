@@ -12,6 +12,7 @@ export default function Faculty() {
         facultyCourseList: []
     }
     const [faculty, updateFaculty] = useState(initFaculty)
+    const [fetchMadeStatus, changeFetchStatus] = useState(false)
 
     const fetchFacultyInfo = async function(){
         const cookie = new Cookies()
@@ -24,14 +25,16 @@ export default function Faculty() {
         })
         const data = await res.json()
         updateFaculty(data.facultyInfo)
+        changeFetchStatus(true)
     }
     useEffect(() => {
-        fetchFacultyInfo()
+        if(fetchMadeStatus === false)
+            fetchFacultyInfo()
     })
 
     return (
         <div>
-            <Navigation />
+            <Navigation facultyId={faculty.facultyId}/>
             <div id="content-container">
                 <Message faculty={faculty}/>
                 <Options faculty={faculty}/>
