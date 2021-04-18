@@ -122,6 +122,43 @@ router.post('/faculty/student_list', facultyAuth, async (req, res) => {
     }
 })
 
+router.get('/faculty/list', async (req, res) => {
+    try{
+        const facultyList = []  //Each element contains object containing department name and professor name,id
+        const conn = await oracledb.getConnection()
+        const query = 'SELECT department_name, id, name FROM Instructor ORDER BY department_name'
+        const resultSet = (await conn.execute(query)).rows
+        var currentFacultyList = {
+            departmentName: '',
+            facultyList: []
+        }
+        resultSet.forEach(record => {
+            if(currentFacultyList.departmentName !== record[0])
+            {
+                if(currentFacultyList.departmentName !== '')
+                    facultyList.push(currentFacultyList)
+                currentFacultyList = {
+                    departmentName: record[0],
+                    facultyList: []
+                }
+            }
+            currentFacultyList.facultyList.push({
+                facultyId: record[1],
+                facultyName: record[2]
+            })
+        })
+        if(currentFacultyList.facultyList.length !== 0)
+            facultyList.push(currentFacultyList)
+        await conn.close()
+        res.send({
+            facultyList
+        })
+        
+    }catch(e){
+        res.status(500).send({err: e})
+    }
+})
+
 router.get('/faculty_logout', facultyAuth, (req, res) => {
     res.send({ })
 })

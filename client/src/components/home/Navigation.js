@@ -27,11 +27,12 @@ function Navigation({ setFormType })
                                             </button>
                                     </li>
                                     <li class="nav-item">
-                                            <button
+                                            <a
                                             class="nav-link"
+                                            href="/faculty-members"
                                             >
                                                 Faculty
-                                            </button>
+                                            </a>
                                     </li>
                                     <li class="nav-item">
                                             <button

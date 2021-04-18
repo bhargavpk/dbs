@@ -1,0 +1,14 @@
+#faculty-members-container{
+    margin: 1rem;
+}
+
+.department-list{
+    padding-left: 1rem;
+}
+.department-container{
+    padding: 0.5rem;
+}
+a{
+    display: block;
+    text-decoration: none;
+}

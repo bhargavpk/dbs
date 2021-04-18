@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter,Route} from 'react-router-dom';
 
 import Home from './pages/Home'
+import FacultyMembers from './pages/FacultyMembers'
 import Faculty from './pages/Faculty'
 import Attendance from './pages/faculty/Attendance'
 import Grades from './pages/faculty/Grades'
@@ -17,6 +18,7 @@ function App()
     <div>
         <BrowserRouter>
                 <Route exact path="/" component={Home} />
+                <Route path="/faculty-members" component={FacultyMembers}/>
                 <Route exact path="/faculty" component={Faculty} />
                 <Route path="/faculty/attendance" component={Attendance} />
                 <Route path="/faculty/grade" component={Grades} />
