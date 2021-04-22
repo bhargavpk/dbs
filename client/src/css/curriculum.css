@@ -1,0 +1,22 @@
+#curriculum-container{
+    margin: 1rem;
+}
+#curriculum-table-container{
+    font-family: 'Times New Roman', Times, serif;
+    padding: 1rem;
+    text-align: center;
+}
+
+.table-header{
+    text-align: center;
+}
+#curriculum-table-container table{
+    display: inline-block;
+    border: 0;
+}
+#curriculum-table-container th, #curriculum-table-container td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+
+}

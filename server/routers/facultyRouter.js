@@ -44,6 +44,9 @@ router.get('/faculty_info', facultyAuth, async (req, res) => {
         const resultSet = (await conn.execute(query)).rows
         query = 'SELECT course_name FROM Course NATURAL JOIN Instr_course WHERE instructor_id = '+facultyId
         const resultSetCourseList = (await conn.execute(query)).rows
+        query = 'SELECT id FROM Faculty_advisor WHERE department_name = \''+resultSet[0][1]+'\''
+        const resultSetFacultyAdvisor = (await conn.execute(query)).rows
+        const isFacultyAdvisor = facultyId===resultSetFacultyAdvisor[0][0]
         const facultyCourseList = []
         resultSetCourseList.forEach(course => {
             facultyCourseList.push(course[0])
@@ -53,7 +56,8 @@ router.get('/faculty_info', facultyAuth, async (req, res) => {
             facultyName: resultSet[0][0],
             facultyDepartment: resultSet[0][1],
             facultyYearOfJoining: resultSet[0][2],
-            facultyCourseList
+            facultyCourseList,
+            isFacultyAdvisor
         }
         
         await conn.close()
@@ -157,6 +161,29 @@ router.get('/faculty/list', async (req, res) => {
     }catch(e){
         res.status(500).send({err: e})
     }
+})
+
+router.get('/faculty/department_courses', facultyAuth, async (req, res) => {
+    try{
+        const facultyId = req.faculty.id
+        const conn = await oracledb.getConnection()
+        const queryDepartment = 'SELECT department_name FROM Instructor WHERE id = '+facultyId
+        const departmentResultSet = (await conn.execute(queryDepartment)).rows
+        const departmentName = departmentResultSet[0][0]
+        const query = 'SELECT C.course_name FROM Course C, Instr_course IC, Instructor I WHERE '+
+                        'C.course_id = IC.course_id AND IC.instructor_id = I.id AND I.department_name = \''+departmentName+'\''
+        const resultSet = (await conn.execute(query)).rows
+        const courseList = []
+        resultSet.forEach(course => {
+            courseList.push(course[0])
+        })
+        await conn.close()
+        res.send({ courseList })
+
+    }catch(e){
+        res.status(500).send({ err: e })
+    }
+
 })
 
 router.get('/faculty_logout', facultyAuth, (req, res) => {

@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react'
-import ListGroup from 'react-bootstrap/ListGroup'
 import '../css/faculty-members.css'
 
 export default function FacultyMembers() {

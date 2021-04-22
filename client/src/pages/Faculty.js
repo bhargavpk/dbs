@@ -9,7 +9,8 @@ export default function Faculty() {
 
     const initFaculty = {
         facultyName: '',
-        facultyCourseList: []
+        facultyCourseList: [],
+        isFacultyAdvisor: false
     }
     const [faculty, updateFaculty] = useState(initFaculty)
     const [fetchMadeStatus, changeFetchStatus] = useState(false)

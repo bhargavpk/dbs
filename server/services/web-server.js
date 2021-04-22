@@ -4,6 +4,7 @@ const cors = require('cors')
 const studentRouter = require('../routers/studentRouter')
 const facultyRouter = require('../routers/facultyRouter')
 const instituteRouter = require('../routers/instituteRouter')
+const miscRouter = require('../routers/miscRouter')
 
 const initializeWebServer = async function(){
     const app = express()
@@ -13,6 +14,7 @@ const initializeWebServer = async function(){
     app.use(studentRouter)
     app.use(facultyRouter)
     app.use(instituteRouter)
+    app.use(miscRouter)
 
     const port = 5000
     app.listen(port, () => {

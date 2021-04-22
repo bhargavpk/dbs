@@ -28,20 +28,29 @@ function Navigation({ setFormType })
                                     </li>
                                     <li class="nav-item">
                                             <a
-                                            class="nav-link"
+                                            className="nav-link"
                                             href="/faculty-members"
                                             >
                                                 Faculty
                                             </a>
                                     </li>
                                     <li class="nav-item">
+                                            <a
+                                            className="nav-link"
+                                            href="/curriculum"
+                                            >
+                                                Curriculum
+                                            </a>
+                                    </li>
+                                    <li class="nav-item">
                                             <button
-                                            class="nav-link"
+                                            className="nav-link"
                                             >
                                                 About
                                             </button>
                                     </li>
                                     
+
                             </ul>
                         </div>
                         <div id="nav-form-container">

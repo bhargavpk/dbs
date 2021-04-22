@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Navigation from '../components/home/Navigation'
 import Student from '../components/home/Student'
 import Faculty from '../components/home/Faculty'
+import Institute from '../components/home/Institute'
 import {Image} from 'react-bootstrap'
 import '../css/home.css'
 
@@ -28,6 +29,8 @@ export default function Home() {
                                 <Student />:
                                 formType === 'faculty'?
                                 <Faculty />:
+                                formType === 'institute'?
+                                <Institute />:
                                 <div />
                         }
                 </div>
