@@ -6,13 +6,13 @@ const facultyAuth = require('../middleware/facultyAuth')
 const router = new express.Router()
 
 router.post('/faculty_login', async (req, res) => {
+    var conn
     try{
         const facultyCredentials = req.body
 
         //Get faculty details
-        const conn = await oracledb.getConnection()
-        var query = 'SELECT id FROM Instructor NATURAL JOIN Instructor_auth WHERE '+
-                        'email = \''+facultyCredentials.email+'\' AND password = \''+facultyCredentials.password+'\''
+        conn = await oracledb.getConnection()
+        var query = 'SELECT instructor_id FROM instructor WHERE email = \''+facultyCredentials.email+'\' AND password = \''+facultyCredentials.password+'\''
         const result = await conn.execute(query)
         const resultSet = result.rows
         await conn.close()
@@ -30,66 +30,37 @@ router.post('/faculty_login', async (req, res) => {
         }
 
     }catch(err){
-        res.status(500).send({ err })
+        await conn.close()
+        res.status(500).send({ err: err.message })
     }
 })
 
 router.get('/faculty_info', facultyAuth, async (req, res) => {
+    var conn
     try{
         const facultyId = req.faculty.id
 
-        const conn = await oracledb.getConnection()
-        var query = 'SELECT name, department_name, EXTRACT(YEAR FROM joining_date) AS joining_year '+ 
-                        'FROM Instructor WHERE id = '+facultyId;
+        conn = await oracledb.getConnection()
+        var query = 'SELECT instructor_name, branch FROM instructor WHERE instructor_id = '+facultyId
         const resultSet = (await conn.execute(query)).rows
-        query = 'SELECT course_name FROM Course NATURAL JOIN Instr_course WHERE instructor_id = '+facultyId
+        
+        query = 'SELECT even_odd FROM essential'
+        const semStatusResultSet = (await conn.execute(query)).rows
+        const semStatus = semStatusResultSet[0][0]
+        query = 'SELECT DISTINCT course_id, course_name FROM instructor_distinct_view NATURAL JOIN registration NATURAL JOIN course WHERE instructor_id = '+facultyId +
+                ' AND MOD(sem, 2) = '+semStatus
         const resultSetCourseList = (await conn.execute(query)).rows
-        query = 'SELECT id FROM Faculty_advisor WHERE department_name = \''+resultSet[0][1]+'\''
-        const resultSetFacultyAdvisor = (await conn.execute(query)).rows
-        const isFacultyAdvisor = facultyId===resultSetFacultyAdvisor[0][0]
         const facultyCourseList = []
         resultSetCourseList.forEach(course => {
-            facultyCourseList.push(course[0])
+            facultyCourseList.push({
+                courseId: course[0],
+                courseName: course[1]
+            })
         })
         const facultyInfo = {
             facultyId,
             facultyName: resultSet[0][0],
             facultyDepartment: resultSet[0][1],
-            facultyYearOfJoining: resultSet[0][2],
-            facultyCourseList,
-            isFacultyAdvisor
-        }
-        
-        await conn.close()
-        res.send({
-            facultyInfo
-        })
-
-    }catch(e){
-        res.status(500).send({err:e})
-    }
-})
-
-router.get('/faculty/profile', async (req, res) => {
-    try{
-        const facultyId = req.query.id
-
-        const conn = await oracledb.getConnection()
-        var query = 'SELECT name, specialization, EXTRACT(YEAR FROM joining_date) AS joining_year, department_name, email '+ 
-                        'FROM Instructor NATURAL JOIN Instructor_auth WHERE id = '+facultyId;
-        const resultSet = (await conn.execute(query)).rows
-        query = 'SELECT course_name FROM Course NATURAL JOIN Instr_course WHERE instructor_id = '+facultyId
-        const resultSetCourseList = (await conn.execute(query)).rows
-        const facultyCourseList = []
-        resultSetCourseList.forEach(course => {
-            facultyCourseList.push(course[0])
-        })
-        const facultyInfo = {
-            facultyName: resultSet[0][0],
-            facultySpecialization: resultSet[0][1],
-            facultyYearOfJoining: resultSet[0][2],
-            facultyDepartment: resultSet[0][3],
-            facultyEmail: resultSet[0][4],
             facultyCourseList
         }
         
@@ -99,17 +70,132 @@ router.get('/faculty/profile', async (req, res) => {
         })
 
     }catch(e){
-        res.status(500).send({err:e})
+        await conn.close()
+        res.status(500).send({ err: e })
+    }
+})
+
+router.get('/faculty/profile', async (req, res) => {
+    var conn
+    try{
+        const facultyId = req.query.id
+
+        conn = await oracledb.getConnection()
+        var query = 'SELECT instructor_name, specialisation, branch, email '+ 
+                        'FROM instructor WHERE instructor_id = '+facultyId
+        const resultSet = (await conn.execute(query)).rows
+        query = 'SELECT even_odd FROM essential'
+        const semStatusResultSet = (await conn.execute(query)).rows
+        const semStatus = semStatusResultSet[0][0]
+        query = 'SELECT course_name FROM course NATURAL JOIN instructor_distinct_view WHERE instructor_id = '+facultyId +
+                ' AND MOD(sem, 2) = '+semStatus
+        const resultSetCourseList = (await conn.execute(query)).rows
+        const facultyCourseList = []
+        resultSetCourseList.forEach(course => {
+            facultyCourseList.push(course[0])
+        })
+        const facultyInfo = {
+            facultyName: resultSet[0][0],
+            facultySpecialization: resultSet[0][1],
+            facultyDepartment: resultSet[0][2],
+            facultyEmail: resultSet[0][3],
+            facultyCourseList
+        }
+        
+        await conn.close()
+        res.send({
+            facultyInfo
+        })
+
+    }catch(e){
+        await conn.close()
+        res.status(500).send({err:e.message})
+    }
+})
+
+router.post('/faculty/attendance_status', facultyAuth, async (req, res) => {
+    var conn
+    try{
+        const {courseId} = req.body
+        conn = await oracledb.getConnection()
+        var query = 'SELECT course_id FROM attendance WHERE course_id = \''+courseId+'\''
+        const resultSet = (await conn.execute(query)).rows
+        await conn.close()
+        if(resultSet.length === 0)
+            res.send({ status: false })
+        else
+            res.send({ status: true })
+
+    }catch(e){
+        await conn.close()
+        res.status(400).send({ err: e.message })
+    }
+})
+router.post('/faculty/submit_attendance', facultyAuth, async (req, res) => {
+    var conn
+    try{
+        const facultyId = req.faculty.id
+        conn = await oracledb.getConnection()
+        const {attendanceData} = req.body
+        console.log(attendanceData)
+        var query = 'INSERT INTO attendance VALUES(:1, :2, :3, :4)'
+        await conn.executeMany(query, attendanceData, {
+            autoCommit: true
+        })
+        res.status(201).send({ status: true })
+
+    }catch(e){
+        await conn.close()
+        res.status(400).send({err: e.message})
+    }
+})
+
+router.post('/faculty/grade_status', facultyAuth, async (req, res) => {
+    var conn
+    try{
+        const {courseId} = req.body
+        conn = await oracledb.getConnection()
+        var query = 'SELECT * FROM temp_grade_report WHERE course_id = \''+courseId+'\''
+        const resultSet = (await conn.execute(query)).rows
+        await conn.close()
+        if(resultSet.length === 0)
+            res.send({ status: false })
+        else
+            res.send({ status: true })
+
+    }catch(e){
+        await conn.close()
+        res.status(400).send({ err: e.message })
+    }
+})
+router.post('/faculty/submit_grade', facultyAuth, async (req, res) => {
+    var conn
+    try{
+        const facultyId = req.faculty.id
+        conn = await oracledb.getConnection()
+        const {gradeData} = req.body
+        var query = 'INSERT INTO temp_grade_report VALUES(:1, :2, :3)'
+        await conn.executeMany(query, gradeData, {
+            autoCommit: true
+        })
+        res.status(201).send({ status: true })
+
+    }catch(e){
+        await conn.close()
+        res.status(400).send({err: e.message})
     }
 })
 
 router.post('/faculty/student_list', facultyAuth, async (req, res) => {
+    var conn
     try{
-        const { courseName } = req.body
-        const conn = await oracledb.getConnection()
-        const query = 'SELECT rollno, name FROM Students, Registration, Course WHERE '+
-                        'Students.id = Registration.student_id AND Registration.course_id = Course.course_id '+
-                        'AND Course.course_name = \''+courseName+'\''
+        const { courseId } = req.body
+        conn = await oracledb.getConnection()
+        var query = 'SELECT even_odd FROM essential'
+        const essentialResultSet = (await conn.execute(query)).rows
+        const semStatus = essentialResultSet[0][0]
+        query = 'SELECT roll, student_name FROM registration NATURAL JOIN student NATURAL JOIN course_allocated NATURAL JOIN course '+
+                        'WHERE instructor_id = ' +req.faculty.id+ ' AND course_id = \''+courseId+'\' AND MOD(sem,2) = '+semStatus
         const resultSet = (await conn.execute(query)).rows
         const studentList = []
         resultSet.forEach(studentInfo => {
@@ -122,15 +208,17 @@ router.post('/faculty/student_list', facultyAuth, async (req, res) => {
         res.send({ studentList })
 
     }catch(e){
-        res.status(500).send({ err: e })
+        await conn.close()
+        res.status(500).send({ err: e.message })
     }
 })
 
 router.get('/faculty/list', async (req, res) => {
+    var conn
     try{
         const facultyList = []  //Each element contains object containing department name and professor name,id
-        const conn = await oracledb.getConnection()
-        const query = 'SELECT department_name, id, name FROM Instructor ORDER BY department_name'
+        conn = await oracledb.getConnection()
+        const query = 'SELECT branch, instructor_id, instructor_name FROM instructor ORDER BY branch'
         const resultSet = (await conn.execute(query)).rows
         var currentFacultyList = {
             departmentName: '',
@@ -159,19 +247,21 @@ router.get('/faculty/list', async (req, res) => {
         })
         
     }catch(e){
+        await conn.close()
         res.status(500).send({err: e})
     }
 })
 
 router.get('/faculty/department_courses', facultyAuth, async (req, res) => {
+    var conn
     try{
         const facultyId = req.faculty.id
-        const conn = await oracledb.getConnection()
-        const queryDepartment = 'SELECT department_name FROM Instructor WHERE id = '+facultyId
+        conn = await oracledb.getConnection()
+        const queryDepartment = 'SELECT branch FROM instructor WHERE instructor_id = '+facultyId
         const departmentResultSet = (await conn.execute(queryDepartment)).rows
         const departmentName = departmentResultSet[0][0]
-        const query = 'SELECT C.course_name FROM Course C, Instr_course IC, Instructor I WHERE '+
-                        'C.course_id = IC.course_id AND IC.instructor_id = I.id AND I.department_name = \''+departmentName+'\''
+        const query = 'SELECT DISTINCT course_name FROM course NATURAL JOIN course_allocated '+ 
+                        'WHERE branch = \''+departmentName+'\''
         const resultSet = (await conn.execute(query)).rows
         const courseList = []
         resultSet.forEach(course => {
@@ -181,6 +271,7 @@ router.get('/faculty/department_courses', facultyAuth, async (req, res) => {
         res.send({ courseList })
 
     }catch(e){
+        await conn.close()
         res.status(500).send({ err: e })
     }
 

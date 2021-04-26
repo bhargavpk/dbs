@@ -2,7 +2,7 @@ const oracledb = require('oracledb')
 
 const initiateOracleConnection = async function(){
     await oracledb.createPool({
-        user: 'project_db',
+        user: 'project',
         password: 'orcl',
         poolMin: 3,
         poolMax: 3,

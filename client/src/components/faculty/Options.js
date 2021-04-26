@@ -5,39 +5,29 @@ import Dropdown from 'react-bootstrap/Dropdown'
 
 export default function Options({ faculty }) {
 
-    const [departmentCourseList, changeDepartmentList] = useState([])
-    const [fetchStatus, changeFetchStatus] = useState(false)
+    // const [departmentCourseList, changeDepartmentList] = useState([])
+    // const [fetchStatus, changeFetchStatus] = useState(false)
 
-    const fetchDepartmentList = async () => {
-        const token = (new Cookies()).get('idToken')
-        const res = await fetch('http://localhost:5000/faculty/department_courses', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer '+token
-            }
-        })
-        const data = await res.json()
-        if(!data.err)
-            changeDepartmentList(data.courseList)
-        changeFetchStatus(true)
-    }
+    // const fetchDepartmentList = async () => {
+    //     const token = (new Cookies()).get('idToken')
+    //     const res = await fetch('http://localhost:5000/faculty/department_courses', {
+    //         method: 'GET',
+    //         headers: {
+    //             'Authorization': 'Bearer '+token
+    //         }
+    //     })
+    //     const data = await res.json()
+    //     if(!data.err)
+    //         changeDepartmentList(data.courseList)
+    //     changeFetchStatus(true)
+    // }
 
-    const changeCourseName = courseName => {
-        const courseWords = courseName.split(' ')
-        var resultantCourse = ''
-        courseWords.forEach(word => {
-            resultantCourse = resultantCourse + word + '_'
-        })
-        resultantCourse = resultantCourse.slice(0, -1)
-        return resultantCourse
-    }
+    const { facultyCourseList: courses } = faculty
 
-    const { facultyCourseList: courses, isFacultyAdvisor } = faculty
-
-    useEffect(() => {
-        if((isFacultyAdvisor === true)&&(fetchStatus === false))
-            fetchDepartmentList()        
-    })
+    // useEffect(() => {
+    //     if((isFacultyAdvisor === true)&&(fetchStatus === false))
+    //         fetchDepartmentList()        
+    // })
 
     return (
         <div id="options-container">
@@ -50,10 +40,10 @@ export default function Options({ faculty }) {
 
                     <Dropdown.Menu>
                         {
-                            courses.map(courseName => (
+                            courses.map(course => (
                                 <div className="options-element">
-                                    <Dropdown.Item href={'/faculty/attendance?course='+changeCourseName(courseName)}>
-                                        {courseName}
+                                    <Dropdown.Item href={'/faculty/attendance?course='+course.courseId}>
+                                        {course.courseName}
                                     </Dropdown.Item>
                                 </div>
                             ))
@@ -69,10 +59,10 @@ export default function Options({ faculty }) {
 
                         <Dropdown.Menu>
                         {
-                            courses.map(courseName => (
+                            courses.map(course => (
                                 <div className="options-element">
-                                    <Dropdown.Item href={'/faculty/grade?course='+changeCourseName(courseName)}>
-                                        {courseName}
+                                    <Dropdown.Item href={'/faculty/grade?course='+course.courseId}>
+                                        {course.courseName}
                                     </Dropdown.Item>
                                 </div>
                             ))
@@ -80,7 +70,7 @@ export default function Options({ faculty }) {
                         </Dropdown.Menu>
                 </Dropdown>
             </div>
-            {
+            {/* {
                 isFacultyAdvisor===true?
                 <div>
                     <span>Select a course to view attendance or grades</span>
@@ -124,7 +114,7 @@ export default function Options({ faculty }) {
                     </div>
                 </div>:
                 <div />
-            }
+            } */}
         </div>
     )
 }

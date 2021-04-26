@@ -5,7 +5,10 @@ import CurriculumTable from '../components/curriculum/CurriculumTable'
 import '../css/curriculum.css'
 
 export default function Curriculum() {
-    const [curriculumCourseList, changeCurriculum] = useState([])
+    const [curriculumCourseList, changeCurriculum] = useState({
+        courseList: [],
+        breadthCourseList: []
+    })
     const [fetchStatus, changeFetchStatus] = useState(false)
     const [departmentName, changeDepartmentName] = useState('')
 
@@ -14,7 +17,7 @@ export default function Curriculum() {
         const data = await res.json()
         if(!data.err)
         {
-            changeCurriculum(data.courseList)
+            changeCurriculum(data)
             changeFetchStatus(true)
         }
     }
@@ -38,8 +41,7 @@ export default function Curriculum() {
                     Select department
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                    <Dropdown.Item as="button" onClick={() => { getDepartmentName('CSE') }}>CSE</Dropdown.Item>
-                    <Dropdown.Item as="button" onClick={() => { getDepartmentName('ECE') }}>ECE</Dropdown.Item>
+                    <Dropdown.Item as="button" onClick={() => { getDepartmentName('CS') }}>CS</Dropdown.Item>
                     <Dropdown.Item as="button" onClick={() => { getDepartmentName('ME') }}>ME</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>

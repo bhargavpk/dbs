@@ -21,13 +21,17 @@ export default function Navigation({ facultyId }) {
         <Redirect to="/" />:
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div id="nav-container">
-                <div id="nav-data-container">
-                    <ul class="navbar-nav mr-auto">
-                            <li class="nav-item">
-                                    <a className="nav-link" href={"/faculty/profile?id="+facultyId}>View profile</a>
-                            </li>              
-                    </ul>
-                </div>
+                {
+                    facultyId===undefined?
+                    <div />:
+                    <div id="nav-data-container">
+                        <ul class="navbar-nav mr-auto">
+                                <li class="nav-item">
+                                        <a className="nav-link" href={"/faculty/profile?id="+facultyId}>View profile</a>
+                                </li>              
+                        </ul>
+                    </div>
+                }
                 <div id="nav-logout-container">
                         <Button
                         variant="danger"

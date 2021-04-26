@@ -10,7 +10,9 @@ router.get('/course/curriculum', async (req, res) => {
             throw new Error('Invalid department name')
         const conn = await oracledb.getConnection()
         //Sort by department name later
-        const queryCourses = 'SELECT * FROM Course ORDER BY semester_no'
+        const queryCourses = `SELECT course_id, course_name, type, sem, credit FROM course NATURAL JOIN (
+            SELECT DISTINCT course_id, sem, branch FROM course_allocated WHERE branch = \'`+departmentName+`\'
+        ) course_info ORDER BY sem`
         const resultSet = (await conn.execute(queryCourses)).rows
         const courseList = []
         var currentCourseList = []
@@ -31,8 +33,33 @@ router.get('/course/curriculum', async (req, res) => {
             })
         })
         courseList.push(currentCourseList)
+
+        const queryBreadthCourses = `SELECT course_id, course_name, type, sem, credit FROM course NATURAL JOIN (
+            SELECT DISTINCT course_id, sem, branch FROM breadth_allocated WHERE branch = \'`+departmentName+`\'
+        ) course_info ORDER BY sem`
+        const breadthResultSet = (await conn.execute(queryBreadthCourses)).rows
+        const breadthCourseList = []
+        currentCourseList = []
+        currentSemester = 3
+        breadthResultSet.forEach(course => {
+            if(course[3] !== currentSemester)
+            {
+                if(currentSemester !== 0)
+                    courseList.push(currentCourseList)
+                currentCourseList = []
+                currentSemester = course[3]
+            }
+            currentCourseList.push({
+                courseId: course[0],
+                courseName: course[1],
+                courseType: course[2],
+                courseCredit: course[4]
+            })
+        })
+        breadthCourseList.push(currentCourseList)
+
         await conn.close()
-        res.send({ courseList })
+        res.send({ courseList, breadthCourseList })
 
     }catch(e){
         res.status(404).send({ err: e })

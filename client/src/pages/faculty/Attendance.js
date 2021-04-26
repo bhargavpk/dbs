@@ -7,21 +7,15 @@ import '../../css/faculty.css'
 
 export default function Attendance( props ) {
     
-    const getCourseName = () => {
-        var urlParamCourseName = props.location.search.split('=')[1]
-        var courseName = ''
-        urlParamCourseName.split('_').forEach(word => {
-            courseName = courseName + word + ' '
-        })
-        courseName = courseName.slice(0, -1)
-        return courseName
+    const getCourseId = () => {
+        return props.location.search.split('=')[1]
     }
 
     const [studentList, changeStudentList] = useState([])
     const [studentListFetched, changeFetchStatus] = useState(false)
 
     const fetchStudentList = async () => {
-        const courseName = getCourseName()
+        const courseId = getCourseId()
         const token = (new Cookies()).get('idToken')
         const res = await fetch('http://localhost:5000/faculty/student_list', {
             method: 'POST',
@@ -29,7 +23,7 @@ export default function Attendance( props ) {
                 'Authorization': 'Bearer '+token,
                 'Content-type': 'application/json'
             },
-            body: JSON.stringify({ courseName })
+            body: JSON.stringify({ courseId })
         })
         const data = await res.json()
         changeStudentList(data.studentList)
@@ -39,18 +33,18 @@ export default function Attendance( props ) {
     useEffect(() => {
         if(studentListFetched === false)
             fetchStudentList()
-    })
+    }, [studentListFetched])
 
     return (
         <div>
             <Navigation />
             <div id="content-container">
                 <div id="display-message-container">
-                    <h3>Attendance for {getCourseName()}</h3>
+                    <h3>Attendance for {getCourseId()}</h3>
                     <hr />
                     <br />
                 </div>
-                <StudentRecords studentList={studentList}/>
+                <StudentRecords studentList={studentList} courseId={getCourseId()}/>
             </div>
         </div>
     )

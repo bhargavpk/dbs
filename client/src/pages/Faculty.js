@@ -9,8 +9,7 @@ export default function Faculty() {
 
     const initFaculty = {
         facultyName: '',
-        facultyCourseList: [],
-        isFacultyAdvisor: false
+        facultyCourseList: []
     }
     const [faculty, updateFaculty] = useState(initFaculty)
     const [fetchMadeStatus, changeFetchStatus] = useState(false)
@@ -31,7 +30,7 @@ export default function Faculty() {
     useEffect(() => {
         if(fetchMadeStatus === false)
             fetchFacultyInfo()
-    })
+    }, [fetchMadeStatus])
 
     return (
         <div>

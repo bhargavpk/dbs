@@ -9,7 +9,6 @@ export default function FacultyProfile(props) {
         facultyDepartment: '',
         facultySpecialization: '',
         facultyCourseList: [],
-        facultyYearOfJoining: '',
         facultyEmail: ''
     })
     const [fetchStatus, changeFetchStatus] = useState(false)
@@ -38,7 +37,6 @@ export default function FacultyProfile(props) {
                 <ListGroup.Item><b>Name</b>: {facultyInfo.facultyName}</ListGroup.Item>
                 <ListGroup.Item><b>Department</b>: {facultyInfo.facultyDepartment}</ListGroup.Item>
                 <ListGroup.Item><b>Specialization</b>: {facultyInfo.facultySpecialization}</ListGroup.Item>
-                <ListGroup.Item><b>Year of joining</b>: {facultyInfo.facultyYearOfJoining}</ListGroup.Item>
                 <ListGroup.Item>
                     <b>Courses taught</b>: {
                         facultyInfo.facultyCourseList.map((courseName, index) => (
