@@ -7,13 +7,13 @@ import StudentForm from '../components/institute/StudentForm'
 import '../css/institute.css'
 
 export default function Institute() {
-    const [semStatus, changeSemStatus] = useState(-1)
+    const [admitStatus, changeAdmitStatus] = useState(-1)
     const [activateStatus, changeActivateStatus] = useState(-1)
     const fetchSemStatus = async () => {
-        const res = await fetch('http://localhost:5000/institute/sem_status')
+        const res = await fetch('http://localhost:5000/institute/admit_status')
         const data = await res.json()
         if(!data.err)
-            changeSemStatus(data.semStatus)
+            changeAdmitStatus(data.admitStatus)
     }
     const fetchActivationStatus = async () => {
         const res = await fetch('http://localhost:5000/institute/activate_next_sem')
@@ -23,9 +23,9 @@ export default function Institute() {
     }
 
     useEffect(() => {
-        if(semStatus === -1)
+        if(admitStatus === -1)
             fetchSemStatus()
-    }, [semStatus])
+    }, [admitStatus])
     useEffect(() => {
         if(activateStatus === -1)
             fetchActivationStatus()
@@ -35,7 +35,22 @@ export default function Institute() {
         const token = (new Cookies()).get('idToken')
         const res = await fetch('http://localhost:5000/institute/go_next_sem', {
             method: 'GET',
-            heades: {
+            headers: {
+                'Authorization': 'Bearer '+token
+            }
+        })
+        const data = await res.json()
+        if(!data.err)
+        {
+            //Reload page
+            window.location.reload()
+        }
+    }
+    const stopAdmissions = async () => {
+        const token = (new Cookies()).get('idToken')
+        const res = await fetch('http://localhost:5000/institute/close_admission', {
+            method: 'GET',
+            headers: {
                 'Authorization': 'Bearer '+token
             }
         })
@@ -50,7 +65,7 @@ export default function Institute() {
     return (
         <div>
             <Navigation />
-            <div id="content-container">
+            <div id="institute-content-container">
                 <h3>Welcome to IIT Bhubaneswar</h3>
                 <hr />
                 {
@@ -60,18 +75,24 @@ export default function Institute() {
                     }}>
                         Cannot proceed to next semester
                     </div>:
-                    <Button title="Go to next sem" variant="success" onClick={()=>{gotoNextSem()}} />
+                    <Button variant="success" onClick={()=>{gotoNextSem()}}>
+                        Go to next sem
+                    </Button>
                 }
                 <hr />
                 {
-                    semStatus!==1?
-                    <div />:
+                    admitStatus!==1?
+                    <span>Admissions closed</span>:
                     <div id="form-container">
                         <h5>Register student</h5>
                         <StudentForm />
+                        <div id="admission-allower-container">
+                            <Button variant="danger" onClick={()=>{stopAdmissions()}}>
+                                Stop admissions
+                            </Button>
+                        </div>
                     </div>
-                }
-                
+                }                
             </div>
         </div>
     )

@@ -29,6 +29,9 @@
     padding: 0.5rem 0;
     text-align: center;
 }
-button#button-container{
+button #button-container{
     display: inline-block;
+}
+div #button-container{
+    color: red;
 }

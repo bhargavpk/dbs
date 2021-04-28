@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken')
 const oracledb = require('oracledb')
 const facultyAuth = require('../middleware/facultyAuth')
 
+oracledb.autoCommit = true
+
 const router = new express.Router()
 
 router.post('/faculty_login', async (req, res) => {
@@ -142,10 +144,12 @@ router.post('/faculty/submit_attendance', facultyAuth, async (req, res) => {
         await conn.executeMany(query, attendanceData, {
             autoCommit: true
         })
+        await conn.close()
         res.status(201).send({ status: true })
 
     }catch(e){
         await conn.close()
+        console.log(e.message)
         res.status(400).send({err: e.message})
     }
 })
@@ -178,10 +182,12 @@ router.post('/faculty/submit_grade', facultyAuth, async (req, res) => {
         await conn.executeMany(query, gradeData, {
             autoCommit: true
         })
+        await conn.close()
         res.status(201).send({ status: true })
 
     }catch(e){
         await conn.close()
+        console.log(e.message)
         res.status(400).send({err: e.message})
     }
 })
@@ -194,7 +200,7 @@ router.post('/faculty/student_list', facultyAuth, async (req, res) => {
         var query = 'SELECT even_odd FROM essential'
         const essentialResultSet = (await conn.execute(query)).rows
         const semStatus = essentialResultSet[0][0]
-        query = 'SELECT roll, student_name FROM registration NATURAL JOIN student NATURAL JOIN course_allocated NATURAL JOIN course '+
+        query = 'SELECT roll, student_name FROM registration NATURAL JOIN student NATURAL JOIN instructor_distinct_view NATURAL JOIN course '+
                         'WHERE instructor_id = ' +req.faculty.id+ ' AND course_id = \''+courseId+'\' AND MOD(sem,2) = '+semStatus
         const resultSet = (await conn.execute(query)).rows
         const studentList = []

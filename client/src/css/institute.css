@@ -3,6 +3,17 @@
     justify-content: space-between;
 }
 
-#content-container{
+#institute-content-container{
     margin: 1rem 2rem;
+}
+
+span #institute-content-container{
+    color: red;
+}
+#admission-allower-container{
+    text-align: center;
+    padding: 0.5rem;
+}
+button #admission-allower-container{
+    display: inline-block;
 }

@@ -21,7 +21,6 @@ export default function StudentRecords({ studentList, courseId }) {
             body: JSON.stringify({ courseId })
         })
         const data = await res.json()
-        console.log(data.status)
         if(data.status === false)
             changeSubmissionStatus(0)
         else
@@ -29,13 +28,10 @@ export default function StudentRecords({ studentList, courseId }) {
 
     }
     const initAttendanceArray = () => {
-        if(recvStudentRecords === false)
-        {
-            changeAttendanceValues(new Array(studentList.length))
-            changeTotalClassesValues(new Array(studentList.length))
-            if(studentList.length !== 0)
-                changeRecvStatus(true)
-        }
+        changeAttendanceValues(new Array(studentList.length))
+        changeTotalClassesValues(new Array(studentList.length))
+        if(studentList.length !== 0)
+            changeRecvStatus(true)
     }
 
     useEffect(() => {
@@ -43,35 +39,49 @@ export default function StudentRecords({ studentList, courseId }) {
             fetchSubmissionStatus()
     }, [submissionStatus])
     useEffect(() => {
-        initAttendanceArray()
-    }, [recvStudentRecords])
+        if(recvStudentRecords === false)
+            initAttendanceArray()
+    })
 
     const submitAttendance = async () => {
         const token = (new Cookies()).get('idToken')
         const attendanceData = []
-        for(var i = 0;i < attendanceValues.length;i++)
+        var i
+        for(i = 0;i < attendanceValues.length;i++)
         {
+            if(attendanceValues[i]===undefined || totalClassesValues[i]===undefined)
+            {
+                changeErrMessage('All the entries need to be filled')
+                break
+            }
+            if(attendanceValues[i]<=0 || totalClassesValues[i]<=0 || attendanceValues[i]>totalClassesValues[i])
+            {
+                changeErrMessage('Invalid attendance data')
+                break
+            }
             const attendanceElement = [courseId, studentList[i].studentRollno, attendanceValues[i], totalClassesValues[i]]
             attendanceData.push(attendanceElement)
         }
-        console.log(attendanceData)
-        const res = await fetch('http://localhost:5000/faculty/submit_attendance', {
-            method: 'POST',
-            headers: {
-                'Content-type':'application/json',
-                'Authorization': 'Bearer '+token
-            },
-            body: JSON.stringify({ attendanceData })
-        })
-        const data = await res.json()
-        if(!data.err)
-            changeSubmissionStatus(1)
-        else
-            changeErrMessage(data.err)
+        if(i === attendanceValues.length)
+        {
+            const res = await fetch('http://localhost:5000/faculty/submit_attendance', {
+                method: 'POST',
+                headers: {
+                    'Content-type':'application/json',
+                    'Authorization': 'Bearer '+token
+                },
+                body: JSON.stringify({ attendanceData })
+            })
+            const data = await res.json()
+            if(!data.err)
+                changeSubmissionStatus(1)
+            else
+                changeErrMessage(data.err)
+        }
     }
 
     return (
-        <div>
+        <div id="student-list-container">
             {
                 submissionStatus===1?
                 <span>Attendance data submitted</span>:
@@ -97,7 +107,10 @@ export default function StudentRecords({ studentList, courseId }) {
                                             type="text"
                                             onInput={e => {
                                                 const newAttendanceValues = [...attendanceValues]
-                                                newAttendanceValues[index] = parseInt(e.target.value)
+                                                if(e.target.value !== '')
+                                                    newAttendanceValues[index] = parseInt(e.target.value)
+                                                else
+                                                    newAttendanceValues[index] = undefined
                                                 changeAttendanceValues(newAttendanceValues)
                                             }}
                                             />
@@ -106,7 +119,10 @@ export default function StudentRecords({ studentList, courseId }) {
                                             type="text"
                                             onInput={e => {
                                                 const newTotalClassesValues = [...totalClassesValues]
-                                                newTotalClassesValues[index] = parseInt(e.target.value)
+                                                if(e.target.value !== '')
+                                                    newTotalClassesValues[index] = parseInt(e.target.value)
+                                                else
+                                                    newTotalClassesValues[index] = undefined
                                                 changeTotalClassesValues(newTotalClassesValues)
                                             }} />
                                         </td>
@@ -117,6 +133,7 @@ export default function StudentRecords({ studentList, courseId }) {
                     </Table>
                     <div id="button-container">
                         <Button variant="success" onClick={()=>{submitAttendance()}}>Submit</Button>
+                        <div>{errMessage}</div>
                     </div>
                 </div>
             }

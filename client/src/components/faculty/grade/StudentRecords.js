@@ -11,12 +11,9 @@ export default function StudentRecords({ studentList, courseId }) {
     const [errMessage, changeErrMessage] = useState('')
 
     const initGradeArray = () => {
-        if(recvStatus === false)
-        {
-            changeGradeList(new Array(studentList.length))
-            if(studentList.length !== 0)
-                changeRecvStatus(true)
-        }
+        changeGradeList(new Array(studentList.length))
+        if(studentList.length !== 0)
+            changeRecvStatus(true)
     }
     const fetchSubmissionStatus = async () => {
         const token = (new Cookies()).get('idToken')
@@ -29,7 +26,6 @@ export default function StudentRecords({ studentList, courseId }) {
             body: JSON.stringify({ courseId })
         })
         const data = await res.json()
-        console.log(data.status)
         if(data.status === false)
             changeSubmissionStatus(0)
         else
@@ -37,8 +33,9 @@ export default function StudentRecords({ studentList, courseId }) {
     }
 
     useEffect(() => {
-        initGradeArray()
-    }, [recvStatus])
+        if(recvStatus === false)
+            initGradeArray()
+    })
     useEffect(() => {
         if(submissionStatus === -1)
             fetchSubmissionStatus()
@@ -47,25 +44,38 @@ export default function StudentRecords({ studentList, courseId }) {
     const submitGrade = async () => {
         const token = (new Cookies()).get('idToken')
         const gradeData = []
-        for(var i = 0;i < gradeList.length;i++)
+        var i
+        for(i = 0;i < gradeList.length;i++)
         {
+            if(gradeList[i]===undefined)
+            {
+                changeErrMessage('All the entries need to be filled')
+                break
+            }
+            if(gradeList[i]<0 || gradeList[i]>10)
+            {
+                changeErrMessage('Invalid grades entered')
+                break
+            }
             const gradeElement = [courseId, studentList[i].studentRollno, gradeList[i]]
             gradeData.push(gradeElement)
         }
-        console.log(gradeData)
-        const res = await fetch('http://localhost:5000/faculty/submit_grade', {
-            method: 'POST',
-            headers: {
-                'Content-type':'application/json',
-                'Authorization': 'Bearer '+token
-            },
-            body: JSON.stringify({ gradeData })
-        })
-        const data = await res.json()
-        if(!data.err)
-            changeSubmissionStatus(1)
-        else
-            changeErrMessage(data.err)
+        if(i === gradeList.length)
+        {
+            const res = await fetch('http://localhost:5000/faculty/submit_grade', {
+                method: 'POST',
+                headers: {
+                    'Content-type':'application/json',
+                    'Authorization': 'Bearer '+token
+                },
+                body: JSON.stringify({ gradeData })
+            })
+            const data = await res.json()
+            if(!data.err)
+                changeSubmissionStatus(1)
+            else
+                changeErrMessage(data.err)
+        }
     }
 
     return (
@@ -96,7 +106,10 @@ export default function StudentRecords({ studentList, courseId }) {
                                             type="text"
                                             onInput={e => {
                                                 const newGradeList = [...gradeList]
-                                                newGradeList[index] = parseInt(e.target.value)
+                                                if(e.target.value !== '')
+                                                    newGradeList[index] = parseInt(e.target.value)
+                                                else
+                                                    newGradeList[index] = undefined
                                                 changeGradeList(newGradeList)
                                             }}
                                             />
@@ -108,6 +121,7 @@ export default function StudentRecords({ studentList, courseId }) {
                     </Table>
                     <div id="button-container">
                         <Button variant="success" onClick={()=>{submitGrade()}}>Submit</Button>
+                        <div>{errMessage}</div>
                     </div>
                 </div>
             }
