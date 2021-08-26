@@ -17,17 +17,18 @@ router.post('/faculty_login', async (req, res) => {
         var query = 'SELECT instructor_id FROM instructor WHERE email = \''+facultyCredentials.email+'\' AND password = \''+facultyCredentials.password+'\''
         const result = await conn.execute(query)
         const resultSet = result.rows
-        await conn.close()
 
         if(result.rows.length === 0)
         {
             //Invalid login credentials
+            await conn.close()
             res.status(401).send({ err: 'Invalid credentials' })
         }
         else
         {
             const facultyId = resultSet[0][0]
             const token = await jwt.sign({id: facultyId}, 'dbs_university_project', {expiresIn: "2 days"})
+            await conn.close()
             res.send({ token })
         }
 
@@ -136,7 +137,6 @@ router.post('/faculty/attendance_status', facultyAuth, async (req, res) => {
 router.post('/faculty/submit_attendance', facultyAuth, async (req, res) => {
     var conn
     try{
-        const facultyId = req.faculty.id
         conn = await oracledb.getConnection()
         const {attendanceData} = req.body
         console.log(attendanceData)

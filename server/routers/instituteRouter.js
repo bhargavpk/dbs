@@ -8,22 +8,24 @@ oracledb.autoCommit = true
 const router = new express.Router()
 
 router.post('/institute/login', async (req, res) => {
+    var conn
     try{
         const {email, password} = req.body
-        const conn = await oracledb.getConnection()
+        conn = await oracledb.getConnection()
         const query = 'SELECT instructor_id FROM institute NATURAL JOIN instructor '+
                         'WHERE email = \''+email+'\' AND password = \''+password+'\''
         const resultSet = (await conn.execute(query)).rows
         if(resultSet.length === 0)
         {
-            await conn.close()
             throw new Error('Invalid credentials')
         }
         const instituteId = resultSet[0][0]
         const token = await jwt.sign({id: instituteId}, 'dbs_university_project', {expiresIn: "2 days"})
+        await conn.close()
         res.send({ token })
 
     }catch(e){
+        await conn.close()
         res.status(401).send({ err: e.message })
     }
 })
@@ -76,6 +78,7 @@ router.post('/institute/admit', instituteAuth, async (req, res) => {
         res.status(201).send({ status: true })
         
     }catch(e){
+        await conn.close()
         res.status(400).send({ err: e.message.split(': ')[1].split('\n')[0] })
     }
 })

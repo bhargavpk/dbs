@@ -43,11 +43,12 @@ function Navigation({ setFormType })
                                             </a>
                                     </li>
                                     <li class="nav-item">
-                                            <button
+                                            <a
                                             className="nav-link"
+                                            href="/about"
                                             >
                                                 About
-                                            </button>
+                                            </a>
                                     </li>
                                     
 

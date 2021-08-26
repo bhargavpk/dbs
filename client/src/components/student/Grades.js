@@ -17,9 +17,9 @@ export default function Grades()
               if(item.semester == 1){
                  sum = sum + (item.credit*item.grad);
                  prev= prev + item.credit;
-                 content.push(<tr><td>{item.courseno}</td><td>{item.grad}</td><td>{item.semester}</td><td>{item.credit}</td></tr>);}
+                 content.push(<tr><td>{item.courseno}</td><td>{item.grad}</td><td>{item.semester}</td><td>{item.credit}</td><td>{item.year}</td></tr>);}
             }
-            content.push(<tr><td colSpan="3">Total SGPA</td><td>{sum/prev}</td></tr>)
+            content.push(<tr><td colSpan="3"><b>Total SGPA</b></td><td>{(sum/prev).toFixed(2)}</td></tr>)
       return content;
    }
 
@@ -32,14 +32,47 @@ export default function Grades()
       if(item.semester==2){
             sum = sum + (item.credit*item.grad);
             prev= prev + item.credit;
-            content.push(<tr><td>{item.courseno}</td><td>{item.grad}</td><td>{item.semester}</td><td>{item.credit}</td></tr>);
+            content.push(<tr><td>{item.courseno}</td><td>{item.grad}</td><td>{item.semester}</td><td>{item.credit}</td><td>{item.year}</td></tr>);
       }
     }
-      content.push(<tr><td colSpan="3">Total SGPA</td><td>{sum/prev}</td></tr>)
+      content.push(<tr><td colSpan="3"><b>Total SGPA</b></td><td>{(sum/prev).toFixed(2)}</td></tr>)
       return content;
     }
 
 
+    const getGradesContentsem3 = student => {
+        let content = [];
+        let prev=0;
+        let sum = 0;
+        for (let i = 0; i < student.length; i++) {
+          const item = student[i];
+          if(item.semester==3){
+                sum = sum + (item.credit*item.grad);
+                prev= prev + item.credit;
+                content.push(<tr><td>{item.courseno}</td><td>{item.grad}</td><td>{item.semester}</td><td>{item.credit}</td><td>{item.year}</td></tr>);
+          }
+        }
+          content.push(<tr><td colSpan="3"><b>Total SGPA</b></td><td>{(sum/prev).toFixed(2)}</td></tr>)
+          return content;
+        }
+
+
+
+        const getGradesContentsem4 = student => {
+            let content = [];
+            let prev=0;
+            let sum = 0;
+            for (let i = 0; i < student.length; i++) {
+              const item = student[i];
+              if(item.semester==4){
+                    sum = sum + (item.credit*item.grad);
+                    prev= prev + item.credit;
+                    content.push(<tr><td>{item.courseno}</td><td>{item.grad}</td><td>{item.semester}</td><td>{item.credit}</td><td>{item.year}</td></tr>);
+              }
+            }
+              content.push(<tr><td colSpan="3"><b>Total SGPA</b></td><td>{(sum/prev).toFixed(2)}</td></tr>)
+              return content;
+            }
     const getsem = student => {
         let f = 1;
         for (let i = 0; i < student.length; i++) {
@@ -89,6 +122,7 @@ export default function Grades()
                             <th>Grade</th>
                             <th>Semester</th>
                             <th>Credit</th>
+                            <th>Year</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -105,10 +139,48 @@ export default function Grades()
                     <th>Grade</th>
                     <th>Semester</th>
                     <th>Credit</th>
+                    <th>Year</th>
                     </tr>
                 </thead>
                 <tbody>
                  { getGradesContentsem2(student) }
+    
+                </tbody>
+                </Table>
+               }
+
+                {c++<=no_sem && 
+                <Table striped bordered hover variant="dark">
+                <thead>
+                    <tr>
+                    <th>Course No</th>
+                    <th>Grade</th>
+                    <th>Semester</th>
+                    <th>Credit</th>
+                    <th>Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                 { getGradesContentsem3(student) }
+    
+                </tbody>
+                </Table>
+               }
+
+            {c++<=no_sem && 
+                <Table striped bordered hover variant="dark">
+                <thead>
+                    <tr>
+                    <th>Course No</th>
+                    <th>Grade</th>
+                    <th>Semester</th>
+                    <th>Credit</th>
+                    <th>Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                 { getGradesContentsem4
+                 (student) }
     
                 </tbody>
                 </Table>

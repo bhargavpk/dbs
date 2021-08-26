@@ -7,6 +7,7 @@ import{Button, Form,Col,Row,Container}  from 'react-bootstrap';
 function Student()
 {
     const [isLoggedIn, changeLoggedStatus] = useState(false)
+    const [errMessageStatus, modifyErrStatus] = useState(false)
 
     const emailRef = useRef(null)
     const passwordRef = useRef(null)
@@ -29,6 +30,8 @@ function Student()
             cookie.set('idToken', token, { path:'/' })
             changeLoggedStatus(true)
         }
+        else
+            modifyErrStatus(true)
     }
   
   return (
@@ -44,7 +47,7 @@ function Student()
                                 <Form.Group as={Row} controlId="formPlaintextEmail">
                                         <Form.Label column sm="2" />
                                         <Col sm="8">
-                                        <Form.Control type="text" placeholder="Email" ref={emailRef} />
+                                        <Form.Control type="text" placeholder="Roll no" ref={emailRef} />
                                         </Col>
                                 </Form.Group>
 
@@ -55,6 +58,11 @@ function Student()
                                         </Col>
                                 </Form.Group>
                                 <div class="text-center">
+                                        {
+                                            errMessageStatus===true?
+                                            <span className="err-message">Invalid credentials</span>:
+                                            <div/>
+                                        }
                                         <Button variant="primary" type="submit">
                                                 Submit
                                         </Button>

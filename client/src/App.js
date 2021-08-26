@@ -6,6 +6,7 @@ import {BrowserRouter,Route} from 'react-router-dom';
 import Home from './pages/Home'
 import FacultyMembers from './pages/FacultyMembers'
 import Curriculum from './pages/Curriculum'
+import About from './pages/About'
 import Faculty from './pages/Faculty'
 import Attendance from './pages/faculty/Attendance'
 import Grades from './pages/faculty/Grades'
@@ -22,6 +23,7 @@ function App()
                 <Route exact path="/" component={Home} />
                 <Route path="/faculty-members" component={FacultyMembers} />
                 <Route path="/curriculum" component={Curriculum} />
+                <Route path="/about" component={About} />
                 <Route exact path="/faculty" component={Faculty} />
                 <Route path="/faculty/attendance" component={Attendance} />
                 <Route path="/faculty/grade" component={Grades} />

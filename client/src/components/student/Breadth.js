@@ -9,10 +9,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 export default function Breadth()
 {
     const [isLog, changeLog] = useState(false)
+    const [isLogsem, changeLogsem] = useState(false)
     const [student, changeStudent] = useState([])
     const [isfetched, changeFetchstatus] = useState(false)
     let Breadth = [];
-    let fir = ["One","Two","Three"]
+    let fir = ["One","Two"]
     let f;
     
     function gotChange()
@@ -26,14 +27,12 @@ export default function Breadth()
         
         const fbr = e.target.One.value
         const sbr = e.target.Two.value
-        const tbr = e.target.Three.value
         //console.log(fbr)
         
         const fname = student[0].courseno;
         const sname = student[1].courseno;
-        const tname = student[2].courseno;
         changeLog(true)
-        var obj = {fname,sname,tname,fbr,sbr,tbr}
+        var obj = {fname,sname,fbr,sbr}
         const token = (new Cookies()).get('idToken')
         const res = await fetch('http://localhost:5000/student_set', {
             method: 'POST',
@@ -87,7 +86,11 @@ export default function Breadth()
         
         console.log(data)
         console.log(data.total)
-        if(data.total >= 3 || data.sem !=2)
+        if(data.sem!=2)
+        {
+            changeLogsem(true)
+        }
+        else if(data.total >= 3 || data.sem !=2)
         {
             changeLog(true)
         }
@@ -139,7 +142,8 @@ export default function Breadth()
           <Container>
               
                <hr></hr>
-               {isLog === true? <div><h1>Already alloted</h1></div>:
+               {isLog === true? <div><h1>Preference submitted</h1></div>:
+                isLogsem === true? <div><h1>Not allowed</h1></div>:
                <Form onSubmit = {setPreference}>
                  
                     {getGradesContentsem1(student)}

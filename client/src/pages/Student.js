@@ -7,6 +7,7 @@ import Attendance from '../components/student/Attendance';
 import Course from '../components/student/Course';
 import Grades from '../components/student/Grades';
 import Breadth from '../components/student/Breadth';
+import Backlog from '../components/student/Backlog';
 
 
 export default function Student() {
@@ -87,6 +88,13 @@ export default function Student() {
                                              >
                                                  View Breadth
                                             </Button>
+                                            <Button
+                                             variant="success"
+                                             className="mx-2 my-2"
+                                             onClick={() => { changeLast('backlog') }}
+                                             >
+                                                 Backlog
+                                            </Button>
                                     
                             </div>
             </Container>
@@ -99,6 +107,8 @@ export default function Student() {
                               <Grades />:
                               last === 'breadth'?
                               <Breadth />:
+                              last === 'backlog'?
+                              <Backlog />:
                               <div />
             }
             
